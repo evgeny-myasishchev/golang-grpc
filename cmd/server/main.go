@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
@@ -16,6 +17,15 @@ type server struct {
 
 func (s *server) SayHello(_ context.Context, in *chat.Message) (*chat.Message, error) {
 	return &chat.Message{Body: in.Body + "World"}, nil
+}
+
+func (s *server) GetMessages(_ *chat.GetMessagesRequest, out chat.ChatService_GetMessagesServer) error {
+	for i := 0; i < 10; i++ {
+		if err := out.Send(&chat.Message{Body: fmt.Sprintf("Message #%v", i)}); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func main() {

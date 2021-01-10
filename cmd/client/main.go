@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -36,4 +37,19 @@ func main() {
 		log.Fatalf("could not greet: %v", err)
 	}
 	log.Printf("Greeting: %s", r.Body)
+
+	log.Println("Getting messages")
+
+	stream, err := c.GetMessages(ctx, &chat.GetMessagesRequest{})
+	if err != nil {
+		log.Fatalf("could not get messages: %v", err)
+	}
+	for {
+		msg, err := stream.Recv()
+		if err == io.EOF {
+			log.Println("Done")
+			break
+		}
+		log.Println("Got message:", msg.Body)
+	}
 }
