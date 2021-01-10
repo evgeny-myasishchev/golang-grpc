@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 
@@ -11,6 +12,10 @@ import (
 
 type server struct {
 	chat.UnimplementedChatServiceServer
+}
+
+func (s *server) SayHello(_ context.Context, in *chat.Message) (*chat.Message, error) {
+	return &chat.Message{Body: in.Body + "World"}, nil
 }
 
 func main() {
