@@ -1,4 +1,6 @@
-.PHONY: protoc proto clean
+.PHONY: proto clean
+
+.DEFAULT_GOAL=proto
 
 DETECTED_OS := $(shell uname)
 
@@ -20,19 +22,17 @@ opt/bin:
 opt/tmp:
 	mkdir -p opt/tmp
 
-clean:
-	rm -r -f opt
-
 $(PROTOC_ZIP): opt/tmp
 	curl -L $(PROTOC_ZIP_URL) -o $(PROTOC_ZIP)
 
 $(PROTOC): $(PROTOC_ZIP)
 	unzip $(PROTOC_ZIP) -d opt
+	touch $(PROTOC)
 
-protoc: $(PROTOC)
+clean:
+	rm -r -f opt
 
-%.pb.go: %.proto
-	echo ${PWD}
-	$(PROTOC) --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative $^
+%.pb.go: %.proto $(PROTOC)
+	$(PROTOC) --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative $<
 
 proto: */*.pb.go
