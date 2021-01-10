@@ -93,5 +93,5 @@ var _ChatService_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "chat/chat.proto",
+	Metadata: "pkg/chat/chat.proto",
 }
