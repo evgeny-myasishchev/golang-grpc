@@ -1,4 +1,4 @@
-.PHONY: protoc clean
+.PHONY: protoc proto clean
 
 DETECTED_OS := $(shell uname)
 
@@ -30,3 +30,9 @@ $(PROTOC): $(PROTOC_ZIP)
 	unzip $(PROTOC_ZIP) -d opt
 
 protoc: $(PROTOC)
+
+%.pb.go: %.proto
+	echo ${PWD}
+	$(PROTOC) --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative $^
+
+proto: chat/chat.pb.go
