@@ -28,6 +28,16 @@ func (s *server) GetMessages(_ *chat.GetMessagesRequest, out chat.ChatService_Ge
 	return nil
 }
 
+func unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	log.Printf("message: %v", info.FullMethod)
+	return handler(ctx, req)
+}
+
+func streamInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	log.Printf("stream: %v", info.FullMethod)
+	return handler(srv, ss)
+}
+
 func main() {
 
 	lis, err := net.Listen("tcp", ":9000")
@@ -35,7 +45,10 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(unaryInterceptor),
+		grpc.ChainStreamInterceptor(streamInterceptor),
+	)
 	chat.RegisterChatServiceServer(grpcServer, &server{})
 
 	if err := grpcServer.Serve(lis); err != nil {
